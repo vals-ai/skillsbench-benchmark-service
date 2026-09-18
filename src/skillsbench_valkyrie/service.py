@@ -273,16 +273,23 @@ async def create_daytona_snapshot(sandbox: Sandbox, snapshot_name: str) -> None:
     try:
         await snapshot_creator(snapshot_name, timeout=EVAL_SNAPSHOT_TIMEOUT_SECONDS)
     except (Exception, asyncio.CancelledError):
-        sandbox_api = getattr(inner, "_sandbox_api", None)
-        api_client = getattr(sandbox_api, "api_client", None)
-        if api_client is not None:
-            with suppress(Exception):
-                from daytona_api_client_async import SnapshotsApi
-
-                snapshots = SnapshotsApi(api_client)
-                snapshot = await snapshots.get_snapshot(snapshot_name)
-                await snapshots.remove_snapshot(snapshot.id)
+        await delete_daytona_snapshot(sandbox, snapshot_name)
         raise
+
+
+async def delete_daytona_snapshot(sandbox: Sandbox, snapshot_name: str) -> None:
+    """Best-effort removal of an eval-resume snapshot once it can no longer be resumed from."""
+    inner = getattr(sandbox, "_sandbox", None)
+    sandbox_api = getattr(inner, "_sandbox_api", None)
+    api_client = getattr(sandbox_api, "api_client", None)
+    if api_client is None:
+        return
+    with suppress(Exception):
+        from daytona_api_client_async import SnapshotsApi
+
+        snapshots = SnapshotsApi(api_client)
+        snapshot = await snapshots.get_snapshot(snapshot_name)
+        await snapshots.remove_snapshot(snapshot.id)
 
 
 async def _delete_owned_sandbox(provider: SandboxProvider, sandbox_id: str) -> None:
@@ -545,6 +552,7 @@ class SkillsBenchBenchmarkService(BenchmarkService):
             try:
                 async for chunk in self._run_verifier(request.task_id, task, cwd, sandbox, requested_dataset):
                     yield chunk
+                await delete_daytona_snapshot(sandbox, state.snapshot)
             finally:
                 await _delete_owned_sandbox(provider, sandbox.id)
 
@@ -580,6 +588,7 @@ class SkillsBenchBenchmarkService(BenchmarkService):
 
         async for chunk in self._run_verifier(task_id, task, cwd, sandbox, dataset):
             yield chunk
+        await delete_daytona_snapshot(sandbox, state.snapshot)
 
     async def _run_verifier(
         self,
