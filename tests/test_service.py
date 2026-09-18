@@ -289,6 +289,40 @@ async def test_evaluate_instance_reads_reward(skillsbench_root: Path) -> None:
     assert result["metadata"]["verifier_reward_dirs"] == ["/logs/verifier", "/logs/tests"]
 
 
+async def test_completed_evaluation_deletes_its_snapshot(
+    skillsbench_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    service = await SkillsBenchBenchmarkService.create()
+    deleted: list[str] = []
+
+    async def delete_snapshot(_sandbox: Sandbox, snapshot_name: str) -> None:
+        deleted.append(snapshot_name)
+
+    monkeypatch.setattr(service_module, "delete_daytona_snapshot", delete_snapshot)
+    chunks = [chunk async for chunk in service.evaluate_instance("hello-world", FakeSandbox(), dataset="default")]
+
+    state = EvalResumeState.model_validate(chunks[0].data)
+    assert isinstance(chunks[-1], StreamResultChunk)
+    assert deleted == [state.snapshot]
+
+
+async def test_failed_evaluation_keeps_its_snapshot(skillsbench_root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    service = await SkillsBenchBenchmarkService.create()
+    deleted: list[str] = []
+
+    async def delete_snapshot(_sandbox: Sandbox, snapshot_name: str) -> None:
+        deleted.append(snapshot_name)
+
+    monkeypatch.setattr(service_module, "delete_daytona_snapshot", delete_snapshot)
+    with pytest.raises(RuntimeError, match="verifier setup failed"):
+        async for _ in service.evaluate_instance(
+            "hello-world", FakeSandbox(exec_error=RuntimeError("verifier setup failed")), dataset="default"
+        ):
+            pass
+
+    assert deleted == []
+
+
 async def test_non_daytona_evaluation_runs_without_retry_checkpoint(
     skillsbench_root: Path,
     monkeypatch: pytest.MonkeyPatch,
