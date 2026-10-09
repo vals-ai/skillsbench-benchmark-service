@@ -36,6 +36,7 @@ from benchmark_service import (
 )
 from benchmark_service.sandbox.daytona import DaytonaSandbox
 from benchmark_service.schemas import (
+    BenchmarkEgressPlan,
     EvaluateResponseRequest,
     FinalScoreResult,
     RetrieveTaskResponse,
@@ -437,6 +438,8 @@ class SkillsBenchBenchmarkService(BenchmarkService):
         cwd = _task_cwd(task, entry)
 
         return RetrieveTaskResponse(
+            # Tasks fetch research sources; verifier scripts install task-specific packages.
+            egress=BenchmarkEgressPlan(setup_task=[], run="*", evaluation="*"),
             source=_sandbox_source(manifest, entry),
             problem_path=_problem_path(cwd),
             cwd=cwd,
