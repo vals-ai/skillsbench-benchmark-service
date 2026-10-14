@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -438,8 +438,8 @@ wheels = [
 
 [[package]]
 name = "create-benchmark-service"
-version = "0.37.3"
-source = { git = "https://github.com/vals-ai/create-benchmark-service.git?tag=v0.37.3#768ac3ee41016bb78c0e620736de2f88525b1e9b" }
+version = "0.41.1"
+source = { git = "https://github.com/vals-ai/create-benchmark-service.git?tag=v0.41.1#36c147a21cf4938abe4a87c2ea4c806d4530f171" }
 dependencies = [
     { name = "boto3" },
     { name = "cachetools" },
@@ -451,8 +451,10 @@ dependencies = [
     { name = "httpx" },
     { name = "jinja2" },
     { name = "modal" },
+    { name = "opentelemetry-api" },
     { name = "pydantic" },
     { name = "pyyaml" },
+    { name = "sentry-sdk", extra = ["fastapi"] },
     { name = "starlette" },
     { name = "tenacity" },
     { name = "websockets" },
@@ -2042,6 +2044,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/df/54/c9218db183846e08efaf68534889ef42e499dde432778881104a42f7071b/sentry_sdk-2.61.1-py3-none-any.whl", hash = "sha256:fa36eaf4b8ad708f718500d4bdcc1532637526a22beb874d88cbc0a46458b5ae", size = 483735, upload-time = "2026-06-01T07:24:17.027Z" },
 ]
 
+[package.optional-dependencies]
+fastapi = [
+    { name = "fastapi" },
+]
+
 [[package]]
 name = "shellingham"
 version = "1.5.4"
@@ -2089,7 +2096,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "create-benchmark-service", git = "https://github.com/vals-ai/create-benchmark-service.git?tag=v0.37.3" },
+    { name = "create-benchmark-service", git = "https://github.com/vals-ai/create-benchmark-service.git?tag=v0.41.1" },
     { name = "pyyaml", specifier = ">=6.0.3" },
 ]
 

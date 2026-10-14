@@ -212,6 +212,9 @@ async def test_lists_and_retrieves_tasks(skillsbench_root: Path) -> None:
     assert response.resources.memory == 4
     assert response.resources.disk == 10
     assert response.agent_timeout == 120.0
+    assert response.model_dump(mode="json")["egress"] == {
+        "setup_task": [], "run": "*", "evaluation": "*"
+    }
 
 
 async def test_setup_default_does_not_inject_skills(skillsbench_root: Path) -> None:

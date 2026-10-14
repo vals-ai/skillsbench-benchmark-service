@@ -5,7 +5,7 @@ description = "Valkyrie benchmark-service adapter for SkillsBench"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "create-benchmark-service==0.37.3",
+    "create-benchmark-service==0.41.1",
     "pyyaml>=6.0.3",
 ]
 
@@ -38,4 +38,4 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.uv.sources]
-create-benchmark-service = { git = "https://github.com/vals-ai/create-benchmark-service.git", tag = "v0.37.3" }
+create-benchmark-service = { git = "https://github.com/vals-ai/create-benchmark-service.git", tag = "v0.41.1" }
