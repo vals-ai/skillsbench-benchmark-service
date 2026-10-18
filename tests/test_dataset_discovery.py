@@ -4,7 +4,7 @@ from typing import cast
 
 import httpx
 import pytest
-from benchmark_service.vals import ValsBenchmarkService, ValsBenchmarkServiceApp, base
+from benchmark_service.vals import ValsBenchmarkService, base
 from benchmark_service.vals.allowlist import TenantConfig
 from fastapi.testclient import TestClient
 
@@ -33,7 +33,9 @@ def test_dataset_discovery_requires_auth_and_filters_names(monkeypatch: pytest.M
         return TenantConfig(datasets=["allowed"])
 
     monkeypatch.setattr(base, "get_tenant_config", tenant_config)
-    with TestClient(ValsBenchmarkServiceApp(SkillsBenchBenchmarkService)) as raw_client:
+    from skillsbench_valkyrie.main import app
+
+    with TestClient(app) as raw_client:
         client = cast(httpx.Client, raw_client)
         assert client.get("/v1/datasets").status_code == 401
         response = client.get("/v1/datasets", headers={"x-descope-api-key": "test-key"})
