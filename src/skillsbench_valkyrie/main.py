@@ -1,8 +1,8 @@
 """ASGI entrypoint for the SkillsBench Valkyrie benchmark service."""
 
+from benchmark_service.vals import ValsBenchmarkServiceApp as BenchmarkServiceApp
 from fastapi import HTTPException, Query, Request
 from fastapi.responses import JSONResponse
-from benchmark_service import BenchmarkServiceApp
 
 from skillsbench_valkyrie.service import SkillsBenchBenchmarkService
 

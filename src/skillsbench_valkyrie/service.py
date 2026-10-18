@@ -24,7 +24,6 @@ from uuid import uuid4
 
 import yaml  # type: ignore[import-untyped]
 from benchmark_service import (
-    BenchmarkService,
     DaytonaProviderConfig,
     ImageSource,
     Resources,
@@ -46,6 +45,7 @@ from benchmark_service.schemas import (
     StreamResultChunk,
 )
 from benchmark_service.v1_schemas import V1Task
+from benchmark_service.vals import ValsBenchmarkService as BenchmarkService
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .vals_helper import bounded_score, build_final_score_metadata
